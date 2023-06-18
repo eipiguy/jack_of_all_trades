@@ -1,10 +1,12 @@
-# Setup
+# Jack of All Trades
+
+## Setup
 
 "Jack of all trades" is a trick taking game in the same mind as Euchre. It is played with a standard deck of cards, removing all but the 9s and up, including the face cards and the aces as high.
 
 Unlike Euchre, all of the cards are dealt into hands of 6 in sets of 2 and 4. Also unlike Euchre are the points and the assignment of a trump suit.
 
-# Play of the Hand
+## Play of the Hand
 
 Rather than counting points as the number of tricks won per hand played, you instead count the number of jacks collected per hand played. Trump suit is determined not by bidding, but by the first jack that is played. Otherwise it is a trick taking game in the style of euchre as normal:
 
@@ -19,7 +21,7 @@ Since the goal is just in the middle of the value chain 9, T, J, Q, K, A, when p
 
 Many trick tacking strategies still apply in new and interesting ways.
 
-# Scoring
+## Scoring
 
 Since there are 4 jacks all together, on average each team should get 2. The issue with this is that each team will collect 2 points on average a round, and winning in this context is based entirely on the deal of the hand.
 
