@@ -1,52 +1,50 @@
 import random
 from strategy import *
 
-ID_TO_CARDINALS = {1:'E', 2:'S', 3:'W', 4:'N'}
-
 class Deck:
-	def __init__(self):
-		self.values_to_rank = {'9':9, 'T':10, 'J':11, 'Q':12, 'K':13, 'A':14}
-		self.ranks_to_values = {9:'9', 10:'T', 11:'J', 12:'Q', 13:'K', 14:'A'}
-		self.suits = {'H', 'S', 'D', 'C'}
 
+	DEFAULT_PLAYERS = 4
+	
+	ID_TO_CARDINALS = { 0:'E', 1:'S', 2:'W', 3:'N' }
+	CHARS_TO_RANKS = { 'A':14, 'K':13, 'Q':12, 'J':11, 'T':10, '9':9 }
+	RANKS_TO_CHARS = { 14: 'A', 13:'K', 12:'Q', 11:'J', 10:'T', 9:'9' }
+	SUITS = { 'H', 'S', 'D', 'C'}
+	TOTAL_CARDS = len(SUITS) * len(CHARS_TO_RANKS)
+
+	def __init__(self):
 		self.cards = []
-		for suit in self.suits:
-			for value in self.values_to_rank:
+		for suit in self.SUITS:
+			for value in self.CHARS_TO_RANKS:
 				self.cards.append(f"{value}{suit}")
 
 	def shuffle(self):
 		random.shuffle(self.cards)
 
-	def deal(self, num_players, num_cards):
+	def deal(self, num_players=DEFAULT_PLAYERS, num_cards=TOTAL_CARDS):
 		hands = [ [] for _ in range(num_players) ]
 		for card_num in range(num_cards):
 			hands[ card_num % num_players ].append(self.cards.pop(-1))
-		for i,hand in enumerate(hands):
-			hands[i] = self.sort_cards(hand)
 		return hands
 
 	def sort_cards(self, cards):
 		by_suit = {}
-		suits = set()
-		for card in cards:
-			suits.add(card[-1])
-		for suit in suits:
+		for suit in self.SUITS:
 			by_suit[suit] = []
 
 		for card in cards:
-			by_suit[card[-1]].append(self.values_to_rank[card[0]])
+			by_suit[card[-1]].append(self.CHARS_TO_RANKS[card[0]])
 
 		sorted = []
 		for sorted_suit in by_suit:
 			by_suit[sorted_suit].sort(reverse=True)
 			sorted.extend([
-				self.ranks_to_values[value] + sorted_suit 
+				self.RANKS_TO_CHARS[value] + sorted_suit
 				for value in by_suit[sorted_suit] ])
 		return sorted
 
 	def print(self):
-		print(f"Values: {self.values_to_rank}")
-		print(f"Values: {self.suits}")
+		print(f"Values: {self.CHARS_TO_RANKS}")
+		print(f"Values: {self.SUITS}")
 		print(f"Remaining cards: {self.cards}")
 
 
@@ -86,14 +84,14 @@ class Trick:
 		if any(played_trump):
 			for i, card in enumerate(self.cards):
 				if played_trump[i]:
-					rank = self.game_deck.values_to_rank[card[0]]
+					rank = Deck.CHARS_TO_RANKS[card[0]]
 					if rank > highest_rank:
 						highest_rank = rank
 						highest_rank_id = i
 		elif any(followed_suit):
 			for i, card in enumerate(self.cards):
 				if followed_suit[i]:
-					rank = self.game_deck.values_to_rank[card[0]]
+					rank = Deck.CHARS_TO_RANKS[card[0]]
 					if rank > highest_rank:
 						highest_rank = rank
 						highest_rank_id = i

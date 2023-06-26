@@ -23,7 +23,7 @@ class Player:
 			if len(legal_plays) == 1:
 				return self.hand.pop(legal_play_ids[0])
 		
-		# TODO: Make a choice
+		# TODO: Make a choice strategy for picking the "best" legal plays
 		choice_id = legal_play_ids[0]
 		return self.hand.pop(choice_id)
 
@@ -40,20 +40,20 @@ class Game:
 		self.deck = Deck()
 		self.game_number = 0
 		self.trick_number = 0
-		self.lead_player = 0
+		self.lead_player_id = 0
 		starting_hands = self.deck.deal(num_players, len(self.deck.cards))
 		self.players = [ Player(f"Player_{i}", i, hand) for i, hand in enumerate(starting_hands) ]
 		self.num_starting_cards = len(starting_hands[0])
 
 	def play_trick(self):
 		num_players = len(self.players)
-		self.cur_trick = Trick(self.deck, num_players, self.lead_player)
+		self.cur_trick = Trick(self.deck, num_players, self.lead_player_id)
 
 		for i in range(num_players):
 			self.cur_trick.play(self.players[self.cur_trick.cur_play].play(self.cur_trick))
 
 		self.cur_trick.print()
 		for i, player in enumerate(self.players):
-			player.memorize_trick(i, self.cur_trick.cards, self.lead_player)
-		self.lead_player = self.cur_trick.id_winning()
+			player.memorize_trick(i, self.cur_trick.cards, self.lead_player_id)
+		self.lead_player_id = self.cur_trick.id_winning()
 		self.trick_number += 1
