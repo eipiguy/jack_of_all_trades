@@ -1,7 +1,5 @@
 import unittest
-
 from cards import *
-
 
 class TestDeck(unittest.TestCase):
 	def setUp(self):
@@ -40,8 +38,9 @@ class TestDeckDeal(unittest.TestCase):
 		num_starting_cards = Deck.TOTAL_CARDS // Deck.DEFAULT_PLAYERS
 		correct_num_cards = [ len(hand) == num_starting_cards for hand in self.test_hands ]
 		self.assertTrue( all(correct_num_cards) )
-		self.assertEqual( len(self.test_deck.cards), 0 )
 
+	def test_none_remaining(self):
+		self.assertEqual( len(self.test_deck.cards), 0 )
 
 if __name__ == '__main__':
 	unittest.main()
