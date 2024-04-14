@@ -68,8 +68,8 @@ class Trick:
 
 	def list_played_trump(self):
 		if self.trump == '':
-			trump = self.determine_trump()
-		return [ card[-1] == trump for card in self.cards ]
+			self.trump = self.determine_trump()
+		return [ card[-1] == self.trump for card in self.cards ]
 
 	def match_suit(self):
 		lead_suit = '' if self.cards[self.lead] == '' else self.cards[self.lead][-1]
@@ -109,7 +109,7 @@ class Trick:
 
 	def print(self):
 		win_id = self.id_winning()
-		print(f"Current Trick: {self.cards}, Lead: {self.lead}, Trump: {self.determine_trump()}")
+		print(f"Current Trick: {self.cards}, Lead: {self.lead}, Trump: {self.trump}")
 		print(f"Played Trump: {[ 'Y' if trump else 'N' for trump in self.list_played_trump() ]}")
 		print(f"Followed Suit: {[ 'Y' if followed else 'N' for followed in self.list_followed_suit() ]}")
 		print(f"Player ID {win_id} won the trick with a {self.cards[win_id]}\n")

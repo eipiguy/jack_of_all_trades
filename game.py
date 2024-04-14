@@ -23,7 +23,7 @@ class Player:
 		if lead_card != '':
 			# filter the legal plays to match the lead suit
 			# (this also handles the case when no cards match, returning the whole hand)
-			legal_plays, legal_play_ids = match_suit(lead_card, self.hand)
+			legal_plays, legal_play_ids = match_suit(self.hand, lead_card[-1])
 
 			# if only one legal play, then play it
 			if len(legal_plays) == 1:
@@ -57,7 +57,8 @@ class Game:
 	# managing trump and adding results to the appropriate variables.
 	def play_trick(self):
 		num_players = len(self.players)
-		self.cur_trick = Trick(self.deck, num_players, self.lead_player_id)
+		self.cur_trick = Trick( self.deck, num_players, self.lead_player_id, self.trump )
+		self.trump = self.cur_trick.trump # once trump is set, it gets saverd for future tricks
 
 		# request a card from each player in turn
 		for i in range(num_players):
@@ -76,7 +77,7 @@ class Game:
 		self.cur_trick.print()
 		self.trump = self.cur_trick.trump
 		for i, player in enumerate(self.players):
-			player.memorize_trick(i, self.cur_trick.cards, self.lead_player_id)
+			player.memorize_trick(i, self.cur_trick.cards, self.lead_player_id, self.trump)
 
 		# then determine the winner for the purposes of starting the next trick
 		self.lead_player_id = self.cur_trick.id_winning()
