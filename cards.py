@@ -20,7 +20,7 @@ class Deck:
 	def shuffle(self):
 		random.shuffle(self.cards)
 
-	def deal(self, num_players=DEFAULT_PLAYERS, num_cards=TOTAL_CARDS):
+	def deal( self, num_players = DEFAULT_PLAYERS, num_cards = TOTAL_CARDS ):
 		hands = [ [] for _ in range(num_players) ]
 		for card_num in range(num_cards):
 			hands[ card_num % num_players ].append(self.cards.pop(-1))
@@ -49,23 +49,26 @@ class Deck:
 
 
 class Trick:
-	def __init__(self, deck, num_players, lead=0):
+	def __init__( self, deck, num_players, lead = 0, trump = '' ):
 		self.game_deck = deck
 		self.cards = [''] * num_players
 		self.lead = lead
-		self.cur_play = lead
+		self.cur_player_id = lead
+		self.trump = trump
 
 	def determine_trump(self):
 		num_players = len(self.cards)
 		for i in range(num_players):
-			cur_player = ( self.lead + i ) % num_players
-			if self.cards[cur_player] == '':
+			check_player = ( self.lead + i ) % num_players
+			if self.cards[check_player] == '':
 				return ''
-			elif self.cards[cur_player][0] == 'J':
-				return self.cards[cur_player][-1]
+			elif self.cards[check_player][0] == 'J':
+				return self.cards[check_player][-1]
+		return ''
 
 	def list_played_trump(self):
-		trump = self.determine_trump()
+		if self.trump == '':
+			trump = self.determine_trump()
 		return [ card[-1] == trump for card in self.cards ]
 
 	def match_suit(self):
@@ -75,36 +78,38 @@ class Trick:
 	def list_followed_suit(self):
 		return list_followed_suit(self.cards, self.lead)
 
+	def check_highest( self, valid_list ):
+		highest_rank = 0
+		highest_rank_id = 0
+		for i, card in enumerate(self.cards):
+			if valid_list[i]:
+				rank = Deck.CHARS_TO_RANKS[card[0]]
+				if rank > highest_rank:
+					highest_rank = rank
+					highest_rank_id = i
+		return highest_rank_id, highest_rank
+
 	def id_winning(self):
 		played_trump = self.list_played_trump()
 		followed_suit = self.list_followed_suit()
 
-		highest_rank = 0
 		highest_rank_id = 0
 		if any(played_trump):
-			for i, card in enumerate(self.cards):
-				if played_trump[i]:
-					rank = Deck.CHARS_TO_RANKS[card[0]]
-					if rank > highest_rank:
-						highest_rank = rank
-						highest_rank_id = i
+			# if anyone played trump, highest trump wins
+			highest_rank_id, _ = self.check_highest(played_trump)
 		elif any(followed_suit):
-			for i, card in enumerate(self.cards):
-				if followed_suit[i]:
-					rank = Deck.CHARS_TO_RANKS[card[0]]
-					if rank > highest_rank:
-						highest_rank = rank
-						highest_rank_id = i
+			# if no one played trump, highest led suit wins
+			highest_rank_id, _ = self.check_highest(followed_suit)
 		return highest_rank_id
 
 	def play(self, card):
-		self.cards[self.cur_play] = card
-		print(f"Player {self.cur_play} played a {card}!")
-		self.cur_play = (self.cur_play + 1) % len(self.cards)
+		self.cards[self.cur_player_id] = card
+		print(f"Player ID {self.cur_player_id} played a {card}!\n")
+		self.cur_player_id = (self.cur_player_id + 1) % len(self.cards)
 
 	def print(self):
 		win_id = self.id_winning()
-		print(f"Current trick: {self.cards}, Lead: {self.lead}, Trump: {self.determine_trump()}")
-		print(f"Trump suit: {[ 'T' if trump else 'F' for trump in self.list_played_trump() ]}")
-		print(f"Followed suit: {[ 'T' if followed else 'F' for followed in self.list_followed_suit() ]}")
-		print(f"Player {win_id} won the trick with a {self.cards[win_id]}\n")
+		print(f"Current Trick: {self.cards}, Lead: {self.lead}, Trump: {self.determine_trump()}")
+		print(f"Played Trump: {[ 'Y' if trump else 'N' for trump in self.list_played_trump() ]}")
+		print(f"Followed Suit: {[ 'Y' if followed else 'N' for followed in self.list_followed_suit() ]}")
+		print(f"Player ID {win_id} won the trick with a {self.cards[win_id]}\n")
