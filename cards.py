@@ -2,12 +2,10 @@ import random
 from strategy import *
 
 class Deck:
-
-	DEFAULT_PLAYERS = 4
 	
 	ID_TO_CARDINALS = { 0:'E', 1:'S', 2:'W', 3:'N' }
-	CHARS_TO_RANKS = { 'A':14, 'K':13, 'Q':12, 'J':11, 'T':10, '9':9 }
-	RANKS_TO_CHARS = { 14: 'A', 13:'K', 12:'Q', 11:'J', 10:'T', 9:'9' }
+	CHARS_TO_RANKS = { 'A':14, 'K':13, 'Q':12, 'J':11 }# 'T':10, '9':9 }
+	RANKS_TO_CHARS = { 14: 'A', 13:'K', 12:'Q', 11:'J' } #, 10:'T', 9:'9' }
 	SUITS = { 'H', 'S', 'D', 'C'}
 	TOTAL_CARDS = len(SUITS) * len(CHARS_TO_RANKS)
 
@@ -20,9 +18,11 @@ class Deck:
 	def shuffle(self):
 		random.shuffle(self.cards)
 
-	def deal( self, num_players = DEFAULT_PLAYERS, num_cards = TOTAL_CARDS ):
+	def deal( self,
+	num_players, 
+	card_per_player ):
 		hands = [ [] for _ in range(num_players) ]
-		for card_num in range(num_cards):
+		for card_num in range( num_players * card_per_player ):
 			hands[ card_num % num_players ].append(self.cards.pop(-1))
 		return hands
 
@@ -77,6 +77,13 @@ class Trick:
 
 	def list_followed_suit(self):
 		return list_followed_suit(self.cards, self.lead)
+
+	def count_jacks( self ):
+		num_jacks = 0
+		for card in self.cards:
+			if card[0] == 'J':
+				num_jacks += 1
+		return num_jacks
 
 	def check_highest( self, valid_list ):
 		highest_rank = 0

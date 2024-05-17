@@ -5,6 +5,8 @@ class Player:
 		self.name = name
 		self.position = position
 		self.hand = starting_hand
+		self.points = 0
+		self.num_jacks = 0
 		self.tricks = []
 		self.memory = [[]]
 
@@ -39,17 +41,18 @@ class Player:
 
 	def print(self):
 		print(f"Player name: {self.name}, cards remaining = {len(self.hand)}")
-		print(f"Current hand: {self.hand}\n")
+		print(f"Current hand: {self.hand}")
+		print(f"Jacks Won: {self.num_jacks}\n")
 
 
 class Game:
-	def __init__(self, num_players=4):
+	def __init__(self, num_players = 2, cards_per_player = 5):
 		self.deck = Deck()
 		self.game_number = 0
 		self.trick_number = 0
 		self.lead_player_id = 0
 		self.trump = ''
-		starting_hands = self.deck.deal(num_players, len(self.deck.cards))
+		starting_hands = self.deck.deal(num_players, cards_per_player)
 		self.players = [ Player(f"Player_{i}", i, hand) for i, hand in enumerate(starting_hands) ]
 		self.num_starting_cards = len(starting_hands[0])
 
@@ -81,4 +84,7 @@ class Game:
 
 		# then determine the winner for the purposes of starting the next trick
 		self.lead_player_id = self.cur_trick.id_winning()
+
+		# assign them points equal to the number of jacks won in the trick
+		self.players[ self.lead_player_id ].num_jacks += self.cur_trick.count_jacks()
 		self.trick_number += 1
