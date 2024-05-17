@@ -15,6 +15,11 @@ class Player:
 		self.tricks = []
 		self.memory.append([])
 
+	def bid(self):
+		# TODO: Make a better bidding
+		# strategy. For now always bids agressive
+		return True
+
 	def play(self, cur_trick):
 		self.print()
 		legal_plays = self.hand
@@ -49,6 +54,7 @@ class Game:
 	def __init__(self, num_players = 2, cards_per_player = 5):
 		self.deck = Deck()
 		self.game_number = 0
+		self.bids = []
 		self.trick_number = 0
 		self.lead_player_id = 0
 		self.trump = ''
@@ -56,12 +62,18 @@ class Game:
 		self.players = [ Player(f"Player_{i}", i, hand) for i, hand in enumerate(starting_hands) ]
 		self.num_starting_cards = len(starting_hands[0])
 
+	# bid whether the player believes they will take the most jacks
+	def bid( self ):
+		self.bids = []
+		for player in self.players:
+			self.bids.append( player.bid() )
+
 	# Request or play one card for each player,
 	# managing trump and adding results to the appropriate variables.
 	def play_trick(self):
 		num_players = len(self.players)
 		self.cur_trick = Trick( self.deck, num_players, self.lead_player_id, self.trump )
-		self.trump = self.cur_trick.trump # once trump is set, it gets saverd for future tricks
+		self.trump = self.cur_trick.trump # once trump is set, it gets saved for future tricks
 
 		# request a card from each player in turn
 		for i in range(num_players):
@@ -88,3 +100,34 @@ class Game:
 		# assign them points equal to the number of jacks won in the trick
 		self.players[ self.lead_player_id ].num_jacks += self.cur_trick.count_jacks()
 		self.trick_number += 1
+
+	def play_round( self ):
+		# Bid, starting with lead
+		# "Will you take the most jacks?"
+		self.bid()
+
+		for i in range( self.num_starting_cards ):
+			self.play_trick()
+
+		# What is the most jacks won amongst the players?
+		most_jacks = 0
+		for player in self.players:
+			if player.num_jacks > most_jacks:
+				most_jacks = player.num_jacks
+		
+		# give a point to the players with the most jacks and reset the jack count
+		round_winners = []
+		for i, player in enumerate( self.players ):
+			if player.num_jacks == most_jacks:
+				player.points += 1
+				round_winners.append(i)
+			player.num_jacks = 0
+
+		# assign points for correct bids
+		for i, player in enumerate( self.players ):
+			# bid and made it
+			if i in round_winners and player.bid:
+				player.points += 1
+			# bid nil and lost (as desired)
+			if i not in round_winners and not player.bid:
+				player.points += 1
